@@ -1,8 +1,6 @@
 from django.conf.urls import url
 from . import views, views_artists, views_venues, views_notes, views_users
 
-from django.contrib.auth import views as auth_views
-
 
 app_name = 'lmn'
 
@@ -21,6 +19,8 @@ urlpatterns = [
     url(r'^notes/detail/(?P<note_pk>\d+)/$', views_notes.note_detail, name='note_detail'),
     url(r'^notes/for_show/(?P<show_pk>\d+)/$', views_notes.notes_for_show, name='notes_for_show'),
     url(r'^notes/add/(?P<show_pk>\d+)/$', views_notes.new_note, name='new_note'),
+    url(r'^notes/(?P<pk>\d+)/edit/$', views_notes.edit_notes, name='edit_notes'),
+    url(r'^notes/(?P<pk>\d+)/remove/$', views_notes.note_remove, name='note_remove'),
 
     # Artist related
     url(r'^artists/list/$', views_artists.artist_list, name='artist_list'),
@@ -28,9 +28,10 @@ urlpatterns = [
     url(r'^artists/venues_played/(?P<artist_pk>\d+)/$', views_artists.venues_for_artist, name='venues_for_artist'),
 
     # User related
+    # Julie add photo url
     url(r'^user/profile/(?P<user_pk>\d+)/$', views_users.user_profile, name='user_profile'),
+    url(r'^user/profile/(?P<user_pk>\d+)/photo$', views_users.user_profile_photo, name='user_profile_photo'),
     url(r'^user/profile/$', views_users.my_user_profile, name='my_user_profile'),
 
     # Login/logout/signup views are in the app-level urls.py
-
 ]

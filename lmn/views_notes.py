@@ -1,15 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-
 from .models import Venue, Artist, Note, Show
 from .forms import VenueSearchForm, NewNoteForm, ArtistSearchForm, UserRegistrationForm
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-
 from django.utils import timezone
-
 from django.core.files.storage import FileSystemStorage
+
 
 @login_required
 def new_note(request, show_pk):
@@ -20,7 +17,7 @@ def new_note(request, show_pk):
 
         form = NewNoteForm(request.POST or None, request.FILES or None)
         if form.is_valid():
-            note = form.save(commit=False);
+            note = form.save(commit=False)
             if note.title and note.text:  # If note has both title and text
                 note.user = request.user
                 note.show = show
@@ -32,7 +29,7 @@ def new_note(request, show_pk):
     else:
         form = NewNoteForm()
 
-    return render(request, 'lmn/notes/new_note.html' , { 'form' : form , 'show':show })
+    return render(request, 'lmn/notes/new_note.html', { 'form' : form , 'show':show })
 
 
 def latest_notes(request):
@@ -41,12 +38,33 @@ def latest_notes(request):
 
 
 def notes_for_show(request, show_pk):   # pk = show pk
-
     # Notes for show, most recent first
     notes = Note.objects.filter(show=show_pk).order_by('posted_date').reverse()
     show = Show.objects.get(pk=show_pk)  # Contains artist, venue
-
     return render(request, 'lmn/notes/note_list.html', {'show': show, 'notes':notes } )
+
+
+@login_required
+def edit_notes(request, pk):
+    notes = get_object_or_404(Note, pk=pk)
+    if requested.method == "POST":
+        form = NewNote(request.POST or None, request.FILES, instance=notes)
+        if form.is_valid():
+            notes = form.save(commit=False)
+            notes.published_date = timezone.now()
+            notes.save()
+            return redirect('lmn:latest_notes', pk=notes.pk)
+            #return redirect('lmn:notes')
+    else:
+        form = NewNote( instance=notes)
+    return render(request, r'lmn/notes/edit.html', {'form': form})
+
+
+@login_required
+def note_remove(request, pk):
+    notes = get_object_or_404(Note, pk=pk)
+    notes.delete()
+    return redirect('lmn:latest_notes')
 
 
 def note_detail(request, note_pk):
