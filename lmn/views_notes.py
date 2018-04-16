@@ -48,7 +48,7 @@ def notes_for_show(request, show_pk):   # pk = show pk
 def edit_notes(request, pk):
     notes = get_object_or_404(Note, pk=pk)
     if requested.method == "POST":
-        form = NewNote(request.POST or None, request.FILES, instance=notes)
+        form = NewNoteForm(request.POST or None, request.FILES, instance=notes)
         if form.is_valid():
             notes = form.save(commit=False)
             notes.published_date = timezone.now()
@@ -56,7 +56,7 @@ def edit_notes(request, pk):
             return redirect('lmn:latest_notes', pk=notes.pk)
             #return redirect('lmn:notes')
     else:
-        form = NewNote( instance=notes)
+        form = NewNoteForm( instance=notes)
     return render(request, r'lmn/notes/edit.html', {'form': form})
 
 
